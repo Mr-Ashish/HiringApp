@@ -1,0 +1,192 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id            String    @id @default(cuid())
+  email         String    @unique
+  name          String?
+  password      String
+  role          UserRole  @default(RECRUITER)
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+  mandates      Mandate[]
+}
+
+enum UserRole {
+  ADMIN
+  RECRUITER
+}
+
+model Client {
+  id            String    @id @default(cuid())
+  name          String
+  contactPerson String?
+  contactEmail  String?
+  contactPhone  String?
+  industry      String?
+  status        ClientStatus @default(ACTIVE)
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+  mandates      Mandate[]
+}
+
+enum ClientStatus {
+  ACTIVE
+  INACTIVE
+}
+
+model Candidate {
+  id            String    @id @default(cuid())
+  fullName      String
+  email         String    @unique
+  phone         String?
+  linkedinUrl   String?
+  currentRole   String?
+  currentCompany String?
+  location      String?
+  keySkills     String[]  // Array of skills
+  yearsOfExperience Int?
+  resumeUrl     String?   // URL to stored resume file
+  source        String?
+  status        CandidateStatus @default(NEW)
+  notes         String?   @db.Text
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+  mandates      CandidatesOnMandates[]
+}
+
+model CandidatesOnMandates {
+  candidate     Candidate @relation(fields: [candidateId], references: [id])
+  candidateId   String
+  mandate       Mandate   @relation(fields: [mandateId], references: [id])
+  mandateId     String
+  assignedAt    DateTime  @default(now())
+  status        CandidateMandateStatus @default(NEW)
+  notes         String?   @db.Text
+
+  @@id([candidateId, mandateId])
+}
+
+enum CandidateStatus {
+  NEW
+  CONTACTED
+  SCREENED
+  INTERVIEWING
+  OFFERED
+  HIRED
+  REJECTED
+  WITHDRAWN
+}
+
+enum CandidateMandateStatus {
+  NEW
+  SHORTLISTED
+  INTERVIEWING
+  OFFERED
+  HIRED
+  REJECTED
+  WITHDRAWN
+}
+
+model Mandate {
+  id            String    @id @default(cuid())
+  title         String
+  client        Client    @relation(fields: [clientId], references: [id])
+  clientId      String
+  recruiter     User      @relation(fields: [recruiterId], references: [id])
+  recruiterId   String
+  priority      Priority  @default(MEDIUM)
+  status        MandateStatus @default(NEW)
+  dateOpened    DateTime  @default(now())
+  
+  // Role Context & Specifications
+  reportingLines String?
+  location      String?
+  employmentType EmploymentType?
+  jobDescription String?  @db.Text
+  keyCompetencies String? @db.Text
+  jobsToBeDone  String?  @db.Text
+  orgCulture    String?  @db.Text
+  performanceExpectations String? @db.Text
+
+  // Compensation & Commercials
+  salaryMin     Float?
+  salaryMax     Float?
+  bonusStructure String? @db.Text
+  equityDetails String?  @db.Text
+  benefits      String?  @db.Text
+  clientAgreement String? @db.Text
+  feePercentage Float?
+
+  // Timeline & Process
+  targetSourcingSLA DateTime?
+  targetOfferDate DateTime?
+  targetCloseDate DateTime?
+  keyMilestones String? @db.Text
+
+  // Candidate Persona
+  idealProfile  String?  @db.Text
+  targetIndustries String? @db.Text
+  experienceMin Int?
+  experienceMax Int?
+  education     String?  @db.Text
+  softSkills    String?  @db.Text
+  personaNotes  String?  @db.Text
+
+  // Sourcing Strategy
+  sourcingChannels String? @db.Text
+  targetCompanies String?  @db.Text
+  keywords       String?  @db.Text
+  doNotApproach String?  @db.Text
+  sourcingNotes String?  @db.Text
+
+  // Qualification
+  clientEngagementScore Int?
+  roleComplexityScore Int?
+  brandNotes    String?  @db.Text
+  pricingThresholdMet Boolean?
+  internalDecision InternalDecision?
+  decisionJustification String? @db.Text
+
+  candidates    CandidatesOnMandates[]
+
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+}
+
+enum Priority {
+  HIGH
+  MEDIUM
+  LOW
+}
+
+enum MandateStatus {
+  NEW
+  OPEN
+  SOURCING
+  INTERVIEWING
+  OFFER
+  FILLED
+  ON_HOLD
+  CLOSED
+}
+
+enum EmploymentType {
+  FULL_TIME
+  CONTRACT
+}
+
+enum InternalDecision {
+  PRIORITIZE
+  DEPRIORITIZE
+  REJECT
+} 
