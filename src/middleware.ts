@@ -1,19 +1,28 @@
+import { withAuth } from "next-auth/middleware";
 import { NextResponse } from "next/server";
-import { getToken } from "next-auth/jwt";
-import { NextRequest } from "next/server";
 
-export async function middleware(req: NextRequest) {
-  const token = await getToken({ req });
-  if (
-    !token &&
-    req.nextUrl.pathname.startsWith("/api/") &&
-    !req.nextUrl.pathname.startsWith("/api/auth/")
-  ) {
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+export default withAuth(
+  function middleware(req) {
+    const requestHeaders = new Headers(req.headers);
+    requestHeaders.set("x-pathname", req.nextUrl.pathname);
+    return NextResponse.next({
+      request: {
+        headers: requestHeaders,
+      },
+    });
+  },
+  {
+    callbacks: {
+      authorized: ({ token }) => !!token,
+    },
   }
-  return NextResponse.next();
-}
+);
 
 export const config = {
-  matcher: ["/api/:path*"],
+  matcher: [
+    "/dashboard/:path*",
+    "/clients/:path*",
+    "/mandates/:path*",
+    "/candidates/:path*",
+  ],
 };

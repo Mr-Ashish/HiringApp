@@ -33,6 +33,8 @@ model Client {
   contactEmail  String?
   contactPhone  String?
   industry      String?
+  location      String?
+  website       String?
   status        ClientStatus @default(ACTIVE)
   createdAt     DateTime  @default(now())
   updatedAt     DateTime  @updatedAt

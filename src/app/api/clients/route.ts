@@ -1,51 +1,58 @@
 import { NextRequest, NextResponse } from "next/server";
 import { PrismaClient } from "@prisma/client";
-
-const prisma = new PrismaClient();
+import { getServerSession } from "next-auth";
+import { authOptions } from "@/lib/auth";
+import prisma from "@/lib/prisma";
 
 // GET: List all clients
-export async function GET(req: NextRequest) {
+export async function GET() {
   try {
-    const clients = await prisma.client.findMany();
+    const session = await getServerSession(authOptions);
+    if (!session) {
+      return new NextResponse("Unauthorized", { status: 401 });
+    }
+
+    const clients = await prisma.client.findMany({
+      orderBy: {
+        createdAt: "desc",
+      },
+    });
+
     return NextResponse.json(clients);
-  } catch (e) {
-    return NextResponse.json(
-      { error: "Failed to fetch clients" },
-      { status: 500 }
-    );
+  } catch (error) {
+    console.error("Error fetching clients:", error);
+    return new NextResponse("Internal Server Error", { status: 500 });
   }
 }
 
 // POST: Create a new client
-export async function POST(req: NextRequest) {
+export async function POST(request: Request) {
   try {
-    const {
-      name,
-      contactPerson,
-      contactEmail,
-      contactPhone,
-      industry,
-      status,
-    } = await req.json();
-    if (!name) {
-      return NextResponse.json({ error: "Name is required" }, { status: 400 });
+    const session = await getServerSession(authOptions);
+    if (!session) {
+      return new NextResponse("Unauthorized", { status: 401 });
     }
+
+    const body = await request.json();
+    const { name, industry, location, website } = body;
+
+    if (!name || !industry || !location || !website) {
+      return new NextResponse("Missing required fields", { status: 400 });
+    }
+
     const client = await prisma.client.create({
       data: {
         name,
-        contactPerson,
-        contactEmail,
-        contactPhone,
         industry,
-        status: status || "ACTIVE",
+        location,
+        website,
       },
     });
+
     return NextResponse.json(client);
-  } catch (e) {
-    return NextResponse.json(
-      { error: "Failed to create client" },
-      { status: 500 }
-    );
+  } catch (error) {
+    console.error("Error creating client:", error);
+    return new NextResponse("Internal Server Error", { status: 500 });
   }
 }
 
