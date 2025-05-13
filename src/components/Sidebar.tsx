@@ -20,7 +20,11 @@ const navSections = [
     items: [
       { label: "Overview", icon: <FaChartLine />, href: "/dashboard" },
       { label: "Clients", icon: <FaUsers />, href: "/clients" },
-      { label: "Mandates", icon: <FaClipboardList />, href: "/mandates" },
+      {
+        label: "Requirements",
+        icon: <FaClipboardList />,
+        href: "/requirements",
+      },
       { label: "Candidates", icon: <FaUsers />, href: "/candidates" },
     ],
   },
@@ -50,18 +54,18 @@ export default function Sidebar() {
 
   return (
     <aside
-      className={`h-screen bg-white border-r flex flex-col justify-between fixed left-0 top-0 z-30 transition-all duration-200 ${
+      className={`h-screen bg-gray-50 border-r border-gray-200 flex flex-col justify-between fixed left-0 top-0 z-30 transition-all duration-200 ${
         collapsed ? "w-20" : "w-72"
       }`}
     >
       <div>
         {/* Logo and Collapse Button */}
-        <div className="flex items-center px-6 py-4 border-b justify-between">
+        <div className="flex items-center px-6 py-4 border-b border-gray-200 justify-between bg-white">
           <div className="flex items-center">
-            <span className="font-bold text-xl text-blue-700">x</span>
+            <span className="font-bold text-xl text-blue-800">x</span>
             {!collapsed && (
               <>
-                <span className="ml-2 font-bold text-xl text-blue-700">
+                <span className="ml-2 font-bold text-xl text-blue-800">
                   to10x
                 </span>
                 <span className="ml-2 text-xs text-gray-500">
@@ -71,7 +75,7 @@ export default function Sidebar() {
             )}
           </div>
           <button
-            className="ml-2 text-gray-400 hover:text-blue-600 focus:outline-none"
+            className="ml-2 text-gray-400 hover:text-indigo-600 focus:outline-none"
             onClick={() => setCollapsed(!collapsed)}
             aria-label={collapsed ? "Expand sidebar" : "Collapse sidebar"}
           >
@@ -91,7 +95,7 @@ export default function Sidebar() {
                 <div key={item.label} className="relative group">
                   <Link
                     href={item.href}
-                    className={`flex items-center px-3 py-2 rounded text-gray-700 hover:bg-blue-50 hover:text-blue-700 transition-colors mb-1 ${
+                    className={`flex items-center px-3 py-2 rounded text-gray-800 hover:bg-indigo-50 hover:text-indigo-600 transition-colors mb-1 ${
                       collapsed ? "justify-center" : ""
                     }`}
                     tabIndex={0}
@@ -116,12 +120,12 @@ export default function Sidebar() {
       </div>
       {/* User Info & Logout Dropdown */}
       <div
-        className={`px-6 py-4 border-t flex items-center relative ${
+        className={`px-6 py-4 border-t border-gray-200 flex items-center relative ${
           collapsed ? "justify-center px-0" : ""
-        }`}
+        } bg-white`}
       >
-        <div className="bg-gray-200 rounded-full w-10 h-10 flex items-center justify-center mr-3">
-          <span className="text-gray-600 font-bold">US</span>
+        <div className="bg-indigo-100 rounded-full w-10 h-10 flex items-center justify-center mr-3">
+          <span className="text-indigo-700 font-bold">US</span>
         </div>
         {!collapsed && (
           <div className="flex-1">
@@ -131,7 +135,7 @@ export default function Sidebar() {
         )}
         <button
           ref={userButtonRef}
-          className="ml-2 text-gray-400 hover:text-blue-600 focus:outline-none"
+          className="ml-2 text-gray-400 hover:text-indigo-600 focus:outline-none"
           onClick={() => setDropdownOpen((open) => !open)}
         >
           <FaUserCircle size={20} />
@@ -141,10 +145,10 @@ export default function Sidebar() {
             ref={dropdownRef}
             className={`absolute ${
               collapsed ? "left-full ml-2 bottom-0" : "right-0 bottom-14"
-            } w-40 bg-white border rounded shadow-lg z-40`}
+            } w-40 bg-white border border-gray-200 rounded shadow-lg z-40`}
           >
             <button
-              className="flex items-center w-full px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+              className="flex items-center w-full px-4 py-2 text-sm text-gray-700 hover:bg-indigo-50 hover:text-indigo-700"
               onClick={() => signOut()}
             >
               <FaSignOutAlt className="mr-2" /> Logout

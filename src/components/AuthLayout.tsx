@@ -1,5 +1,6 @@
 "use client";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
+import { useEffect } from "react";
 import { SidebarProvider } from "./SidebarContext";
 import Sidebar from "./Sidebar";
 import MainContent from "./MainContent";
@@ -12,11 +13,23 @@ export default function AuthLayout({
   children: React.ReactNode;
 }) {
   const pathname = usePathname();
-  const isAuthPage = pathname === "/login" || pathname === "/register";
+  const router = useRouter();
+  const isAuthPage =
+    pathname === "/login" || pathname === "/register" || pathname === "/";
+  const sidebarVisible = !!session && !isAuthPage;
+
+  useEffect(() => {
+    if (session && isAuthPage) {
+      router.replace("/dashboard");
+    }
+  }, [session, isAuthPage, router]);
+
   return (
     <SidebarProvider>
-      {session && !isAuthPage && <Sidebar />}
-      <MainContent isAuthPage={isAuthPage}>{children}</MainContent>
+      {sidebarVisible && <Sidebar />}
+      <MainContent isAuthPage={isAuthPage} sidebarVisible={sidebarVisible}>
+        {children}
+      </MainContent>
     </SidebarProvider>
   );
 }
