@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { useState, useRef, useEffect } from "react";
+import { usePathname } from "next/navigation";
 import {
   FaUserCircle,
   FaUsers,
@@ -35,6 +36,7 @@ export default function Sidebar() {
   const { collapsed, setCollapsed } = useSidebar();
   const dropdownRef = useRef<HTMLDivElement>(null);
   const userButtonRef = useRef<HTMLButtonElement>(null);
+  const pathname = usePathname();
 
   useEffect(() => {
     if (!dropdownOpen) return;
@@ -95,9 +97,14 @@ export default function Sidebar() {
                 <div key={item.label} className="relative group">
                   <Link
                     href={item.href}
-                    className={`flex items-center px-3 py-2 rounded text-gray-800 hover:bg-indigo-50 hover:text-indigo-600 transition-colors mb-1 ${
-                      collapsed ? "justify-center" : ""
-                    }`}
+                    className={`flex items-center px-3 py-2 rounded transition-colors mb-1
+                      ${collapsed ? "justify-center" : ""}
+                      ${
+                        pathname.startsWith(item.href)
+                          ? "bg-indigo-100 text-indigo-700 font-semibold"
+                          : "text-gray-800 hover:bg-indigo-50 hover:text-indigo-600"
+                      }
+                    `}
                     tabIndex={0}
                   >
                     <span className="text-lg">{item.icon}</span>

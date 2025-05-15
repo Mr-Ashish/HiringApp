@@ -1,5 +1,6 @@
 import { withAuth } from "next-auth/middleware";
 import { NextResponse } from "next/server";
+import { isProtectedRoute } from "./lib/auth-config";
 
 export default withAuth(
   function middleware(req) {
@@ -13,16 +14,15 @@ export default withAuth(
   },
   {
     callbacks: {
-      authorized: ({ token }) => !!token,
+      authorized: ({ token, req }) => {
+        // Only check auth for protected routes
+        return !isProtectedRoute(req.nextUrl.pathname) || !!token;
+      },
     },
   }
 );
 
+// Configure which routes to run middleware on
 export const config = {
-  matcher: [
-    "/dashboard/:path*",
-    "/clients/:path*",
-    "/mandates/:path*",
-    "/candidates/:path*",
-  ],
+  matcher: ["/((?!api|_next/static|_next/image|favicon.ico).*)"],
 };

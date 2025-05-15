@@ -2,6 +2,9 @@
 
 import { useState, useEffect } from "react";
 import Link from "next/link";
+import DashboardLayout from "@/components/DashboardLayout";
+import PageContainer from "@/components/layouts/PageContainer";
+import TableContainer from "@/components/layouts/TableContainer";
 
 interface Client {
   id: string;
@@ -38,8 +41,8 @@ export default function ClientsPage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gray-50 p-8">
-        <div className="max-w-7xl mx-auto">
+      <DashboardLayout title="Clients">
+        <PageContainer>
           <div className="animate-pulse">
             <div className="h-8 bg-gray-200 rounded w-1/4 mb-8"></div>
             <div className="space-y-4">
@@ -48,26 +51,26 @@ export default function ClientsPage() {
               ))}
             </div>
           </div>
-        </div>
-      </div>
+        </PageContainer>
+      </DashboardLayout>
     );
   }
 
   if (error) {
     return (
-      <div className="min-h-screen bg-gray-50 p-8">
-        <div className="max-w-7xl mx-auto">
+      <DashboardLayout title="Clients">
+        <PageContainer>
           <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded">
             {error}
           </div>
-        </div>
-      </div>
+        </PageContainer>
+      </DashboardLayout>
     );
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 p-8">
-      <div className="max-w-7xl mx-auto">
+    <DashboardLayout title="Clients">
+      <PageContainer>
         <div className="flex justify-between items-center mb-8">
           <h1 className="text-3xl font-bold text-gray-900">Clients</h1>
           <Link
@@ -78,7 +81,7 @@ export default function ClientsPage() {
           </Link>
         </div>
 
-        <div className="bg-white shadow rounded-lg overflow-hidden">
+        <TableContainer>
           <table className="min-w-full divide-y divide-gray-200">
             <thead className="bg-gray-50">
               <tr>
@@ -132,23 +135,17 @@ export default function ClientsPage() {
                   <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
                     <Link
                       href={`/clients/${client.id}`}
-                      className="text-blue-600 hover:text-blue-900 mr-4"
+                      className="text-blue-600 hover:text-blue-900"
                     >
                       View
-                    </Link>
-                    <Link
-                      href={`/clients/${client.id}/edit`}
-                      className="text-indigo-600 hover:text-indigo-900"
-                    >
-                      Edit
                     </Link>
                   </td>
                 </tr>
               ))}
             </tbody>
           </table>
-        </div>
-      </div>
-    </div>
+        </TableContainer>
+      </PageContainer>
+    </DashboardLayout>
   );
 }

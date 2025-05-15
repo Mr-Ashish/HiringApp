@@ -2,27 +2,44 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import DashboardLayout from "@/components/DashboardLayout";
+import StyledInput from "@/components/StyledInput";
 
 export default function NewClientPage() {
   const router = useRouter();
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [formData, setFormData] = useState({
+    name: "",
+    industry: "",
+    location: "",
+    website: "",
+    contactPerson: "",
+    contactEmail: "",
+    contactPhone: "",
+  });
+
+  const handleChange = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
+  ) => {
+    const { name, value } = e.target;
+    setFormData((prev) => ({ ...prev, [name]: value }));
+  };
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setLoading(true);
     setError(null);
 
-    const formData = new FormData(e.currentTarget);
-    const data = {
-      name: formData.get("name"),
-      industry: formData.get("industry"),
-      location: formData.get("location"),
-      website: formData.get("website"),
-      contactPerson: formData.get("contactPerson"),
-      contactEmail: formData.get("contactEmail"),
-      contactPhone: formData.get("contactPhone"),
-    };
+    // Validate website URL
+    let website = formData.website;
+    if (
+      website &&
+      !website.startsWith("http://") &&
+      !website.startsWith("https://")
+    ) {
+      website = `https://${website}`;
+    }
 
     try {
       const response = await fetch("/api/clients", {
@@ -30,11 +47,12 @@ export default function NewClientPage() {
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify(data),
+        body: JSON.stringify({ ...formData, website }),
       });
 
       if (!response.ok) {
-        throw new Error("Failed to create client");
+        const data = await response.json();
+        throw new Error(data.message || "Failed to create client");
       }
 
       router.push("/clients");
@@ -47,149 +65,90 @@ export default function NewClientPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 p-8">
-      <div className="max-w-2xl mx-auto">
-        <h1 className="text-3xl font-bold text-gray-900 mb-8">
-          Add New Client
-        </h1>
-
+    <DashboardLayout title="Add New Client">
+      <div className="max-w-2xl mx-auto bg-white rounded-lg shadow p-8">
         {error && (
           <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded mb-6">
             {error}
           </div>
         )}
 
-        <form
-          onSubmit={handleSubmit}
-          className="space-y-6 bg-white p-6 rounded-lg shadow"
-        >
-          <div>
-            <label
-              htmlFor="name"
-              className="block text-sm font-medium text-gray-700"
-            >
-              Company Name *
-            </label>
-            <input
-              type="text"
-              name="name"
-              id="name"
-              required
-              className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
-            />
-          </div>
+        <form onSubmit={handleSubmit} className="space-y-6">
+          <StyledInput
+            label="Company Name"
+            name="name"
+            value={formData.name}
+            onChange={handleChange}
+            required
+          />
 
-          <div>
-            <label
-              htmlFor="industry"
-              className="block text-sm font-medium text-gray-700"
-            >
-              Industry *
-            </label>
-            <input
-              type="text"
-              name="industry"
-              id="industry"
-              required
-              className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
-            />
-          </div>
+          <StyledInput
+            label="Industry"
+            name="industry"
+            value={formData.industry}
+            onChange={handleChange}
+            required
+          />
 
-          <div>
-            <label
-              htmlFor="location"
-              className="block text-sm font-medium text-gray-700"
-            >
-              Location *
-            </label>
-            <input
-              type="text"
-              name="location"
-              id="location"
-              required
-              className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
-            />
-          </div>
+          <StyledInput
+            label="Location"
+            name="location"
+            value={formData.location}
+            onChange={handleChange}
+            required
+          />
 
-          <div>
-            <label
-              htmlFor="website"
-              className="block text-sm font-medium text-gray-700"
-            >
-              Website *
-            </label>
-            <input
-              type="url"
-              name="website"
-              id="website"
-              required
-              className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
-            />
-          </div>
+          <StyledInput
+            label="Website"
+            name="website"
+            type="text"
+            value={formData.website}
+            onChange={handleChange}
+            placeholder="example.com"
+            required
+          />
 
-          <div>
-            <label
-              htmlFor="contactPerson"
-              className="block text-sm font-medium text-gray-700"
-            >
-              Contact Person
-            </label>
-            <input
-              type="text"
-              name="contactPerson"
-              id="contactPerson"
-              className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
-            />
-          </div>
+          <StyledInput
+            label="Contact Person"
+            name="contactPerson"
+            value={formData.contactPerson}
+            onChange={handleChange}
+          />
 
-          <div>
-            <label
-              htmlFor="contactEmail"
-              className="block text-sm font-medium text-gray-700"
-            >
-              Contact Email
-            </label>
-            <input
-              type="email"
-              name="contactEmail"
-              id="contactEmail"
-              className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
-            />
-          </div>
+          <StyledInput
+            label="Contact Email"
+            name="contactEmail"
+            type="email"
+            value={formData.contactEmail}
+            onChange={handleChange}
+          />
 
-          <div>
-            <label
-              htmlFor="contactPhone"
-              className="block text-sm font-medium text-gray-700"
-            >
-              Contact Phone
-            </label>
-            <input
-              type="tel"
-              name="contactPhone"
-              id="contactPhone"
-              className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
-            />
-          </div>
+          <StyledInput
+            label="Contact Phone"
+            name="contactPhone"
+            type="tel"
+            value={formData.contactPhone}
+            onChange={handleChange}
+          />
 
           <div className="flex justify-end space-x-4">
             <button
               type="button"
               onClick={() => router.back()}
-              className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+              className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
             >
               Cancel
             </button>
             <button
               type="submit"
               disabled={loading}
-              className="px-4 py-2 text-sm font-medium text-white bg-blue-600 border border-transparent rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50"
+              className="px-4 py-2 text-sm font-medium text-white bg-indigo-600 border border-transparent rounded-md hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 disabled:opacity-50"
             >
               {loading ? "Creating..." : "Create Client"}
             </button>
           </div>
         </form>
       </div>
-    </div>
+    </DashboardLayout>
   );
 }

@@ -1,5 +1,5 @@
 "use client";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import DashboardLayout from "@/components/DashboardLayout";
 import StyledInput, {
@@ -17,11 +17,14 @@ const TABS = [
   "Qualification",
 ];
 
-export default function NewMandatePage() {
+export default function NewRequirementPage() {
   const [tab, setTab] = useState(0);
   const [form, setForm] = useState<any>({});
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [clients, setClients] = useState<any[]>([]);
+  const [clientsLoading, setClientsLoading] = useState(true);
+  const [clientsError, setClientsError] = useState<string | null>(null);
   const router = useRouter();
 
   const handleChange = (
@@ -37,13 +40,13 @@ export default function NewMandatePage() {
     setLoading(true);
     setError(null);
     try {
-      const res = await fetch("/api/mandates", {
+      const res = await fetch("/api/requirements", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(form),
       });
-      if (!res.ok) throw new Error("Failed to create mandate");
-      router.push("/mandates");
+      if (!res.ok) throw new Error("Failed to create requirement");
+      router.push("/requirements");
     } catch (err) {
       setError(err instanceof Error ? err.message : "An error occurred");
     } finally {
@@ -51,407 +54,428 @@ export default function NewMandatePage() {
     }
   };
 
+  useEffect(() => {
+    async function fetchClients() {
+      setClientsLoading(true);
+      setClientsError(null);
+      try {
+        const res = await fetch("/api/clients");
+        if (!res.ok) throw new Error("Failed to fetch clients");
+        const data = await res.json();
+        setClients(data);
+      } catch (err) {
+        setClientsError(
+          err instanceof Error ? err.message : "Failed to load clients"
+        );
+      } finally {
+        setClientsLoading(false);
+      }
+    }
+    fetchClients();
+  }, []);
+
   return (
-    <DashboardLayout title="New Mandate">
-      <div className="bg-white border border-gray-200 rounded-lg shadow p-8 max-w-3xl mx-auto">
-        <h1 className="text-2xl font-bold text-gray-800 mb-6">New Mandate</h1>
-        <div className="w-full max-w-full overflow-x-auto mb-8">
-          <div className="flex flex-nowrap space-x-2">
-            {TABS.map((t, i) => (
+    <DashboardLayout title="New Requirement">
+      <div className="max-w-4xl mx-auto bg-white rounded-lg shadow p-8">
+        <div className="mb-6">
+          <div className="flex space-x-4 border-b">
+            {TABS.map((tabName, index) => (
               <button
-                key={t}
-                className={`px-4 py-2 rounded-t font-semibold text-sm focus:outline-none transition-colors ${
-                  tab === i
-                    ? "bg-indigo-100 text-indigo-700 border-b-2 border-indigo-600"
-                    : "bg-gray-50 text-gray-500 hover:bg-indigo-50"
+                key={tabName}
+                onClick={() => setTab(index)}
+                className={`px-4 py-2 font-medium text-sm ${
+                  tab === index
+                    ? "border-b-2 border-indigo-500 text-indigo-600"
+                    : "text-gray-500 hover:text-gray-700"
                 }`}
-                onClick={() => setTab(i)}
-                type="button"
               >
-                {t}
+                {tabName}
               </button>
             ))}
           </div>
         </div>
+
         {error && (
-          <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded mb-4">
+          <div className="mb-4 p-4 bg-red-50 border border-red-200 text-red-700 rounded">
             {error}
           </div>
         )}
+
         <form onSubmit={handleSubmit}>
-          {/* Tab 0: Requirements */}
+          {/* Requirements Tab */}
           {tab === 0 && (
             <div className="space-y-4">
-              <div>
-                <label className="block text-sm font-medium text-gray-700">
-                  Title *
-                </label>
-                <StyledInput name="title" required onChange={handleChange} />
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700">
-                  Client ID *
-                </label>
-                <StyledInput name="clientId" required onChange={handleChange} />
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700">
-                  Recruiter ID *
-                </label>
-                <StyledInput
-                  name="recruiterId"
-                  required
-                  onChange={handleChange}
-                />
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700">
-                  Priority
-                </label>
-                <StyledSelect name="priority" onChange={handleChange}>
-                  <option value="MEDIUM">Medium</option>
-                  <option value="HIGH">High</option>
-                  <option value="LOW">Low</option>
-                </StyledSelect>
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700">
-                  Status
-                </label>
-                <StyledSelect name="status" onChange={handleChange}>
-                  <option value="NEW">New</option>
-                  <option value="OPEN">Open</option>
-                  <option value="SOURCING">Sourcing</option>
-                  <option value="INTERVIEWING">Interviewing</option>
-                  <option value="OFFER">Offer</option>
-                  <option value="FILLED">Filled</option>
-                  <option value="ON_HOLD">On Hold</option>
-                  <option value="CLOSED">Closed</option>
-                </StyledSelect>
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700">
-                  Date Opened
-                </label>
-                <StyledInput
-                  type="date"
-                  name="dateOpened"
-                  onChange={handleChange}
-                />
-              </div>
+              <StyledInput
+                label="Title"
+                name="title"
+                value={form.title || ""}
+                onChange={handleChange}
+                required
+              />
+              <StyledSelect
+                label="Client"
+                name="clientId"
+                value={form.clientId || ""}
+                onChange={handleChange}
+                required
+              >
+                <option value="">Select Client</option>
+                {clientsLoading && <option disabled>Loading clients...</option>}
+                {clientsError && <option disabled>{clientsError}</option>}
+                {!clientsLoading &&
+                  !clientsError &&
+                  clients.map((client) => (
+                    <option key={client.id} value={client.id}>
+                      {client.name}
+                    </option>
+                  ))}
+              </StyledSelect>
+              <StyledSelect
+                label="Priority"
+                name="priority"
+                value={form.priority || ""}
+                onChange={handleChange}
+                required
+              >
+                <option value="">Select Priority</option>
+                <option value="HIGH">High</option>
+                <option value="MEDIUM">Medium</option>
+                <option value="LOW">Low</option>
+              </StyledSelect>
+              <StyledSelect
+                label="Status"
+                name="status"
+                value={form.status || ""}
+                onChange={handleChange}
+                required
+              >
+                <option value="">Select Status</option>
+                <option value="OPEN">Open</option>
+                <option value="IN_PROGRESS">In Progress</option>
+                <option value="CLOSED">Closed</option>
+              </StyledSelect>
+              <StyledInput
+                label="Date Opened"
+                name="dateOpened"
+                type="date"
+                value={form.dateOpened || ""}
+                onChange={handleChange}
+                required
+              />
             </div>
           )}
-          {/* Tab 1: Role Context */}
+
+          {/* Role Context Tab */}
           {tab === 1 && (
             <div className="space-y-4">
-              <div>
-                <label className="block text-sm font-medium text-gray-700">
-                  Reporting Lines
-                </label>
-                <StyledInput name="reportingLines" onChange={handleChange} />
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700">
-                  Location
-                </label>
-                <StyledInput name="location" onChange={handleChange} />
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700">
-                  Employment Type
-                </label>
-                <StyledSelect name="employmentType" onChange={handleChange}>
-                  <option value="FULL_TIME">Full Time</option>
-                  <option value="CONTRACT">Contract</option>
-                </StyledSelect>
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700">
-                  Job Description
-                </label>
-                <StyledTextarea
-                  name="jobDescription"
-                  rows={3}
-                  onChange={handleChange}
-                />
-              </div>
+              <StyledInput
+                label="Reporting Lines"
+                name="reportingLines"
+                value={form.reportingLines || ""}
+                onChange={handleChange}
+                required
+              />
+              <StyledInput
+                label="Location"
+                name="location"
+                value={form.location || ""}
+                onChange={handleChange}
+                required
+              />
+              <StyledSelect
+                label="Employment Type"
+                name="employmentType"
+                value={form.employmentType || ""}
+                onChange={handleChange}
+                required
+              >
+                <option value="">Select Type</option>
+                <option value="FULL_TIME">Full Time</option>
+                <option value="PART_TIME">Part Time</option>
+                <option value="CONTRACT">Contract</option>
+              </StyledSelect>
+              <StyledTextarea
+                label="Job Description"
+                name="jobDescription"
+                value={form.jobDescription || ""}
+                onChange={handleChange}
+                rows={6}
+                required
+              />
             </div>
           )}
-          {/* Tab 2: Compensation */}
+
+          {/* Compensation Tab */}
           {tab === 2 && (
             <div className="space-y-4">
-              <div>
-                <label className="block text-sm font-medium text-gray-700">
-                  Salary Min
-                </label>
+              <div className="grid grid-cols-2 gap-4">
                 <StyledInput
-                  type="number"
+                  label="Minimum Salary"
                   name="salaryMin"
-                  onChange={handleChange}
-                />
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700">
-                  Salary Max
-                </label>
-                <StyledInput
                   type="number"
+                  value={form.salaryMin || ""}
+                  onChange={handleChange}
+                  required
+                />
+                <StyledInput
+                  label="Maximum Salary"
                   name="salaryMax"
-                  onChange={handleChange}
-                />
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700">
-                  Bonus Structure
-                </label>
-                <StyledInput name="bonusStructure" onChange={handleChange} />
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700">
-                  Equity Details
-                </label>
-                <StyledInput name="equityDetails" onChange={handleChange} />
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700">
-                  Benefits
-                </label>
-                <StyledInput name="benefits" onChange={handleChange} />
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700">
-                  Fee Percentage
-                </label>
-                <StyledInput
                   type="number"
-                  name="feePercentage"
+                  value={form.salaryMax || ""}
                   onChange={handleChange}
+                  required
                 />
               </div>
+              <StyledInput
+                label="Bonus Structure"
+                name="bonusStructure"
+                value={form.bonusStructure || ""}
+                onChange={handleChange}
+              />
+              <StyledInput
+                label="Equity Details"
+                name="equityDetails"
+                value={form.equityDetails || ""}
+                onChange={handleChange}
+              />
+              <StyledTextarea
+                label="Benefits"
+                name="benefits"
+                value={form.benefits || ""}
+                onChange={handleChange}
+                rows={4}
+              />
+              <StyledInput
+                label="Fee Percentage"
+                name="feePercentage"
+                type="number"
+                value={form.feePercentage || ""}
+                onChange={handleChange}
+                required
+              />
             </div>
           )}
-          {/* Tab 3: Timeline */}
+
+          {/* Timeline Tab */}
           {tab === 3 && (
             <div className="space-y-4">
-              <div>
-                <label className="block text-sm font-medium text-gray-700">
-                  Target Sourcing SLA
-                </label>
-                <StyledInput
-                  type="date"
-                  name="targetSourcingSLA"
-                  onChange={handleChange}
-                />
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700">
-                  Target Offer Date
-                </label>
-                <StyledInput
-                  type="date"
-                  name="targetOfferDate"
-                  onChange={handleChange}
-                />
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700">
-                  Target Close Date
-                </label>
-                <StyledInput
-                  type="date"
-                  name="targetCloseDate"
-                  onChange={handleChange}
-                />
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700">
-                  Key Milestones
-                </label>
-                <StyledTextarea
-                  name="keyMilestones"
-                  rows={2}
-                  onChange={handleChange}
-                />
-              </div>
+              <StyledInput
+                label="Target Sourcing SLA"
+                name="targetSourcingSLA"
+                type="date"
+                value={form.targetSourcingSLA || ""}
+                onChange={handleChange}
+                required
+              />
+              <StyledInput
+                label="Target Offer Date"
+                name="targetOfferDate"
+                type="date"
+                value={form.targetOfferDate || ""}
+                onChange={handleChange}
+                required
+              />
+              <StyledInput
+                label="Target Close Date"
+                name="targetCloseDate"
+                type="date"
+                value={form.targetCloseDate || ""}
+                onChange={handleChange}
+                required
+              />
+              <StyledTextarea
+                label="Key Milestones"
+                name="keyMilestones"
+                value={form.keyMilestones || ""}
+                onChange={handleChange}
+                rows={4}
+              />
             </div>
           )}
-          {/* Tab 4: Candidate Persona */}
+
+          {/* Candidate Persona Tab */}
           {tab === 4 && (
             <div className="space-y-4">
-              <div>
-                <label className="block text-sm font-medium text-gray-700">
-                  Ideal Profile
-                </label>
-                <StyledTextarea
-                  name="idealProfile"
-                  rows={2}
-                  onChange={handleChange}
-                />
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700">
-                  Target Industries
-                </label>
-                <StyledInput name="targetIndustries" onChange={handleChange} />
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700">
-                  Experience Min
-                </label>
+              <StyledTextarea
+                label="Ideal Profile"
+                name="idealProfile"
+                value={form.idealProfile || ""}
+                onChange={handleChange}
+                rows={4}
+                required
+              />
+              <StyledInput
+                label="Target Industries"
+                name="targetIndustries"
+                value={form.targetIndustries || ""}
+                onChange={handleChange}
+              />
+              <div className="grid grid-cols-2 gap-4">
                 <StyledInput
-                  type="number"
+                  label="Minimum Experience (years)"
                   name="experienceMin"
-                  onChange={handleChange}
-                />
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700">
-                  Experience Max
-                </label>
-                <StyledInput
                   type="number"
-                  name="experienceMax"
+                  value={form.experienceMin || ""}
                   onChange={handleChange}
+                  required
+                />
+                <StyledInput
+                  label="Maximum Experience (years)"
+                  name="experienceMax"
+                  type="number"
+                  value={form.experienceMax || ""}
+                  onChange={handleChange}
+                  required
                 />
               </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700">
-                  Education
-                </label>
-                <StyledInput name="education" onChange={handleChange} />
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700">
-                  Soft Skills
-                </label>
-                <StyledInput name="softSkills" onChange={handleChange} />
-              </div>
+              <StyledInput
+                label="Education"
+                name="education"
+                value={form.education || ""}
+                onChange={handleChange}
+              />
+              <StyledTextarea
+                label="Soft Skills"
+                name="softSkills"
+                value={form.softSkills || ""}
+                onChange={handleChange}
+                rows={4}
+              />
+              <StyledTextarea
+                label="Persona Notes"
+                name="personaNotes"
+                value={form.personaNotes || ""}
+                onChange={handleChange}
+                rows={4}
+              />
             </div>
           )}
-          {/* Tab 5: Sourcing */}
+
+          {/* Sourcing Tab */}
           {tab === 5 && (
             <div className="space-y-4">
-              <div>
-                <label className="block text-sm font-medium text-gray-700">
-                  Sourcing Channels
-                </label>
-                <StyledInput name="sourcingChannels" onChange={handleChange} />
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700">
-                  Target Companies
-                </label>
-                <StyledInput name="targetCompanies" onChange={handleChange} />
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700">
-                  Keywords
-                </label>
-                <StyledInput name="keywords" onChange={handleChange} />
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700">
-                  Do Not Approach
-                </label>
-                <StyledInput name="doNotApproach" onChange={handleChange} />
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700">
-                  Sourcing Notes
-                </label>
-                <StyledTextarea
-                  name="sourcingNotes"
-                  rows={2}
-                  onChange={handleChange}
-                />
-              </div>
+              <StyledInput
+                label="Sourcing Channels"
+                name="sourcingChannels"
+                value={form.sourcingChannels || ""}
+                onChange={handleChange}
+              />
+              <StyledTextarea
+                label="Target Companies"
+                name="targetCompanies"
+                value={form.targetCompanies || ""}
+                onChange={handleChange}
+                rows={4}
+              />
+              <StyledInput
+                label="Keywords"
+                name="keywords"
+                value={form.keywords || ""}
+                onChange={handleChange}
+              />
+              <StyledTextarea
+                label="Do Not Approach"
+                name="doNotApproach"
+                value={form.doNotApproach || ""}
+                onChange={handleChange}
+                rows={4}
+              />
+              <StyledTextarea
+                label="Sourcing Notes"
+                name="sourcingNotes"
+                value={form.sourcingNotes || ""}
+                onChange={handleChange}
+                rows={4}
+              />
             </div>
           )}
-          {/* Tab 6: Qualification */}
+
+          {/* Qualification Tab */}
           {tab === 6 && (
             <div className="space-y-4">
-              <div>
-                <label className="block text-sm font-medium text-gray-700">
-                  Client Engagement Score
-                </label>
-                <StyledInput
-                  type="number"
-                  name="clientEngagementScore"
-                  onChange={handleChange}
+              <StyledInput
+                label="Client Engagement Score"
+                name="clientEngagementScore"
+                type="number"
+                min="1"
+                max="10"
+                value={form.clientEngagementScore || ""}
+                onChange={handleChange}
+                required
+              />
+              <StyledInput
+                label="Role Complexity Score"
+                name="roleComplexityScore"
+                type="number"
+                min="1"
+                max="10"
+                value={form.roleComplexityScore || ""}
+                onChange={handleChange}
+                required
+              />
+              <StyledTextarea
+                label="Brand Notes"
+                name="brandNotes"
+                value={form.brandNotes || ""}
+                onChange={handleChange}
+                rows={4}
+              />
+              <div className="flex items-center space-x-2">
+                <input
+                  type="checkbox"
+                  id="pricingThresholdMet"
+                  name="pricingThresholdMet"
+                  checked={form.pricingThresholdMet || false}
+                  onChange={(e) =>
+                    setForm({ ...form, pricingThresholdMet: e.target.checked })
+                  }
+                  className="h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300 rounded"
                 />
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700">
-                  Role Complexity Score
-                </label>
-                <StyledInput
-                  type="number"
-                  name="roleComplexityScore"
-                  onChange={handleChange}
-                />
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700">
-                  Brand Notes
-                </label>
-                <StyledInput name="brandNotes" onChange={handleChange} />
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700">
+                <label
+                  htmlFor="pricingThresholdMet"
+                  className="text-sm font-medium text-gray-700"
+                >
                   Pricing Threshold Met
                 </label>
-                <StyledSelect
-                  name="pricingThresholdMet"
-                  onChange={handleChange}
-                >
-                  <option value="true">Yes</option>
-                  <option value="false">No</option>
-                </StyledSelect>
               </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700">
-                  Internal Decision
-                </label>
-                <StyledInput name="internalDecision" onChange={handleChange} />
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700">
-                  Decision Justification
-                </label>
-                <StyledTextarea
-                  name="decisionJustification"
-                  rows={2}
-                  onChange={handleChange}
-                />
-              </div>
+              <StyledSelect
+                label="Internal Decision"
+                name="internalDecision"
+                value={form.internalDecision || ""}
+                onChange={handleChange}
+                required
+              >
+                <option value="">Select Decision</option>
+                <option value="APPROVED">Approved</option>
+                <option value="PENDING">Pending</option>
+                <option value="REJECTED">Rejected</option>
+              </StyledSelect>
+              <StyledTextarea
+                label="Decision Justification"
+                name="decisionJustification"
+                value={form.decisionJustification || ""}
+                onChange={handleChange}
+                rows={4}
+                required
+              />
             </div>
           )}
-          <div className="flex justify-between mt-8">
+
+          <div className="mt-8 flex justify-end space-x-4">
             <button
               type="button"
-              className="px-4 py-2 rounded bg-gray-200 text-gray-700 font-semibold hover:bg-gray-300"
-              onClick={() => setTab((t) => Math.max(0, t - 1))}
-              disabled={tab === 0}
+              onClick={() => router.back()}
+              className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
             >
-              Previous
+              Cancel
             </button>
-            {tab < TABS.length - 1 ? (
-              <button
-                type="button"
-                className="px-4 py-2 rounded bg-indigo-600 text-white font-semibold hover:bg-indigo-700"
-                onClick={() => setTab((t) => Math.min(TABS.length - 1, t + 1))}
-              >
-                Next
-              </button>
-            ) : (
-              <button
-                type="submit"
-                className="px-6 py-2 rounded bg-indigo-600 text-white font-semibold hover:bg-indigo-700 disabled:opacity-50"
-                disabled={loading}
-              >
-                {loading ? "Creating..." : "Create Mandate"}
-              </button>
-            )}
+            <button
+              type="submit"
+              disabled={loading}
+              className="px-4 py-2 text-sm font-medium text-white bg-indigo-600 border border-transparent rounded-md hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 disabled:opacity-50"
+            >
+              {loading ? "Creating..." : "Create Requirement"}
+            </button>
           </div>
         </form>
       </div>

@@ -326,3 +326,75 @@ When committing changes to the repository, follow these guidelines:
 3. Implement candidate status update workflow
 4. Add candidate notes and activity history
 5. Implement candidate export functionality
+
+## Common Layout Components & Usage Guidelines
+
+To ensure consistent spacing, alignment, and responsiveness across all pages, use the following reusable layout components:
+
+### 1. PageContainer
+
+- **Purpose:** Centers content and constrains max width (e.g., forms, tables, main content).
+- **Usage:**
+  ```tsx
+  <PageContainer maxWidth="max-w-5xl">...</PageContainer>
+  ```
+- **Default:** `max-w-5xl` and `mx-auto` for centering. Adjust `maxWidth` as needed (e.g., `max-w-2xl` for forms).
+- **All main content should be wrapped in PageContainer.**
+
+### 2. PageHeader
+
+- **Purpose:** Consistent page titles and action buttons (e.g., "Add New Requirement").
+- **Usage:**
+  ```tsx
+  <PageHeader
+    title="Requirements"
+    action={{ label: "Add New", href: "/requirements/new" }}
+  />
+  ```
+- **Place at the top of each main page.**
+
+### 3. TableContainer
+
+- **Purpose:** Consistent table styling, background, and horizontal scrolling.
+- **Usage:**
+  ```tsx
+  <TableContainer>
+    {" "}
+    <table>...</table>{" "}
+  </TableContainer>
+  ```
+- **Wrap all data tables in TableContainer.**
+
+### Guidelines
+
+- **Always use these components for new pages and when refactoring old ones.**
+- **Do not apply custom max-width or centering to individual pages; use PageContainer instead.**
+- **If you need to change spacing or width globally, update the relevant layout component.**
+- **This ensures that spacing, alignment, and responsiveness are consistent everywhere.**
+
+_See the components in `src/components/layouts/` for implementation details._
+
+### Layout Hierarchy Guidelines
+
+- **All main pages (list, forms, etc.) must use `DashboardLayout` as the outermost wrapper.**
+- **All main content must be wrapped in `PageContainer` inside `DashboardLayout`.**
+- **For list/table pages, use `maxWidth="max-w-7xl"` in `PageContainer` for a wide, centered layout.**
+- **For forms or detail pages, use a narrower max width (e.g., `max-w-2xl`).**
+- **This ensures all main content is at the same hierarchy and spacing, and global layout changes can be made in one place.**
+
+_Example:_
+
+```tsx
+<DashboardLayout title="...">
+  <PageContainer maxWidth="max-w-7xl">...main content...</PageContainer>
+</DashboardLayout>
+```
+
+### Table Usage Guidelines
+
+- **All tables must be wrapped in `TableContainer` for consistent scroll and styling.**
+- **Any table-related changes (scroll, background, border, etc.) should be made in `TableContainer` for global effect.**
+- **Do not wrap tables in custom divs or containers; always use the shared component.**
+- **LEARNING:** Enforce the use of common components for general UI patterns (like tables, forms, layouts) to ensure consistency and make global changes easy.
+
+---

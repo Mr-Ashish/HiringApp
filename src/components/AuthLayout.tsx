@@ -4,6 +4,7 @@ import { useEffect } from "react";
 import { SidebarProvider } from "./SidebarContext";
 import Sidebar from "./Sidebar";
 import MainContent from "./MainContent";
+import { isPublicRoute } from "@/lib/auth-config";
 
 export default function AuthLayout({
   session,
@@ -14,15 +15,15 @@ export default function AuthLayout({
 }) {
   const pathname = usePathname();
   const router = useRouter();
-  const isAuthPage =
-    pathname === "/login" || pathname === "/register" || pathname === "/";
+  const isAuthPage = isPublicRoute(pathname);
   const sidebarVisible = !!session && !isAuthPage;
 
   useEffect(() => {
-    if (session && isAuthPage) {
+    // Only redirect if we have a session and we're on an auth page
+    if (session && isAuthPage && pathname !== "/") {
       router.replace("/dashboard");
     }
-  }, [session, isAuthPage, router]);
+  }, [session, isAuthPage, router, pathname]);
 
   return (
     <SidebarProvider>

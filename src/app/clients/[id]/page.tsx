@@ -10,6 +10,8 @@ interface Client {
   contactEmail: string;
   contactPhone: string;
   industry: string;
+  location?: string;
+  website?: string;
   status: "ACTIVE" | "INACTIVE";
 }
 
@@ -24,6 +26,8 @@ export default function EditClientPage({ params }: { params: { id: string } }) {
     contactEmail: "",
     contactPhone: "",
     industry: "",
+    location: "",
+    website: "",
     status: "ACTIVE" as const,
   });
 
@@ -41,7 +45,16 @@ export default function EditClientPage({ params }: { params: { id: string } }) {
       if (!response.ok) throw new Error("Failed to fetch client");
       const data = await response.json();
       setClient(data);
-      setFormData(data);
+      setFormData({
+        name: data.name ?? "",
+        contactPerson: data.contactPerson ?? "",
+        contactEmail: data.contactEmail ?? "",
+        contactPhone: data.contactPhone ?? "",
+        industry: data.industry ?? "",
+        location: data.location ?? "",
+        website: data.website ?? "",
+        status: data.status ?? "ACTIVE",
+      });
     } catch (err) {
       setError("Error loading client");
       console.error(err);
@@ -84,6 +97,13 @@ export default function EditClientPage({ params }: { params: { id: string } }) {
 
   return (
     <div className="p-8">
+      <button
+        type="button"
+        onClick={() => router.back()}
+        className="mb-4 px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+      >
+        ← Back
+      </button>
       <h1 className="text-2xl font-bold text-gray-900 mb-6">
         {params.id === "new" ? "Add New Client" : "Edit Client"}
       </h1>
@@ -124,7 +144,6 @@ export default function EditClientPage({ params }: { params: { id: string } }) {
               name="contactPerson"
               value={formData.contactPerson}
               onChange={handleChange}
-              required
               className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
             />
           </div>
@@ -142,7 +161,6 @@ export default function EditClientPage({ params }: { params: { id: string } }) {
               name="contactEmail"
               value={formData.contactEmail}
               onChange={handleChange}
-              required
               className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
             />
           </div>
@@ -160,7 +178,6 @@ export default function EditClientPage({ params }: { params: { id: string } }) {
               name="contactPhone"
               value={formData.contactPhone}
               onChange={handleChange}
-              required
               className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
             />
           </div>
@@ -178,7 +195,40 @@ export default function EditClientPage({ params }: { params: { id: string } }) {
               name="industry"
               value={formData.industry}
               onChange={handleChange}
-              required
+              className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+            />
+          </div>
+
+          <div>
+            <label
+              htmlFor="location"
+              className="block text-sm font-medium text-gray-700"
+            >
+              Location
+            </label>
+            <input
+              type="text"
+              id="location"
+              name="location"
+              value={formData.location}
+              onChange={handleChange}
+              className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+            />
+          </div>
+
+          <div>
+            <label
+              htmlFor="website"
+              className="block text-sm font-medium text-gray-700"
+            >
+              Website
+            </label>
+            <input
+              type="text"
+              id="website"
+              name="website"
+              value={formData.website}
+              onChange={handleChange}
               className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
             />
           </div>
