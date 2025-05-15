@@ -14,6 +14,8 @@
 - Sidebar and main content layout responsive to sidebar state
 - CRUD logic for clients implemented (API + UI)
 - Dashboard page scaffolded with new layout
+- Responsive design implemented across all pages
+- Search and filter functionality added to requirements page
 
 ## Major Refactors & Improvements (May 13, 2025)
 
@@ -35,6 +37,64 @@
 - Requirements form is multi-tabbed, with each section clearly separated.
 - All form fields are now visually distinct, even when not focused.
 - Layout and navigation updated to reflect the requirements-first workflow.
+- Responsive design implemented across all pages:
+  - Mobile-first approach with Tailwind's responsive classes
+  - Flexible grid layouts that adapt to screen size
+  - Collapsible tables with horizontal scroll on mobile
+  - Stacked form elements on smaller screens
+  - Consistent spacing and padding across devices
+  - Touch-friendly button sizes and spacing
+
+## Commit Guidelines
+
+When committing changes to the repository, follow these guidelines:
+
+1. **Commit Message Format:**
+
+   ```
+   type(scope): description
+
+   [optional body]
+   [optional footer]
+   ```
+
+2. **Types:**
+
+   - `feat`: New feature
+   - `fix`: Bug fix
+   - `docs`: Documentation changes
+   - `style`: Code style changes (formatting, etc.)
+   - `refactor`: Code refactoring
+   - `test`: Adding or modifying tests
+   - `chore`: Maintenance tasks
+
+3. **Scopes:**
+
+   - `auth`: Authentication related
+   - `ui`: UI components and styling
+   - `api`: API routes and endpoints
+   - `db`: Database schema and migrations
+   - `deps`: Dependency updates
+   - `config`: Configuration changes
+
+4. **Examples:**
+
+   ```
+   feat(ui): add responsive design to requirements page
+   fix(auth): resolve login redirect loop
+   docs(api): update API documentation
+   style(ui): improve form input styling
+   ```
+
+5. **Commit Process:**
+   1. Create a new branch for your feature/fix
+   2. Make your changes
+   3. Test thoroughly
+   4. Update documentation if needed
+   5. Commit with descriptive message
+   6. Create pull request
+   7. Get code review
+   8. Merge after approval
 
 ## Steps to Debug and Fix
 
@@ -71,6 +131,8 @@
 - [x] Dashboard and all authenticated pages use the new layout
 - [x] All navigation and section links are now in the left sidebar
 - [x] Top bar removed for a cleaner, focused workspace
+- [x] Responsive design implemented across all pages
+- [x] Search and filter functionality added to requirements page
 
 ### 5. Mandate API Implementation
 
@@ -80,7 +142,7 @@
   - [x] Get single mandate (GET /api/mandates/[id])
   - [x] Update mandate (PUT /api/mandates/[id])
   - [x] Delete mandate (DELETE /api/mandates/[id])
-- [ ] Frontend implementation for mandates (list, detail, create/edit form) is next
+- [x] Frontend implementation for mandates (list, detail, create/edit form)
 
 ## Next Steps for Phase 1 (when resuming)
 
@@ -89,6 +151,7 @@
    - [x] Multi-section/tabbed form for create/edit
    - [x] List and detail views
    - [x] Consistent, beautiful form fields
+   - [x] Responsive design implementation
 2. **Candidate Management**
    - Implement CRUD logic for Candidates (API + UI)
    - Candidate form with resume upload (file handling)
@@ -131,7 +194,135 @@
 - SidebarContext is used to manage and share the collapsed state between sidebar and main layout
 - Rationale: This provides a consistent, focused navigation experience after login and matches modern SaaS dashboard patterns
 
+## [2024-05-13] Authentication & Route Protection Improvements
+
+### 1. Centralized Route Protection
+
+- Created `src/lib/auth-config.ts` for centralized management of protected and public routes
+- Added type-safe route definitions with TypeScript
+- Implemented helper functions for route checking and redirects
+- All protected routes now properly require authentication:
+  - `/dashboard`
+  - `/clients`
+  - `/requirements`
+  - `/candidates`
+
+### 2. Middleware Enhancements
+
+- Updated middleware to use centralized route configuration
+- Improved route protection logic
+- Added proper type safety for route matching
+- Ensured consistent behavior across all protected routes
+
+### 3. Auth Layout Improvements
+
+- Updated AuthLayout to use centralized route configuration
+- Improved session handling and redirects
+- Better type safety for route checking
+- More maintainable code structure
+
+### 4. Benefits of New System
+
+- Single source of truth for route protection
+- Type-safe route names and configurations
+- Easy to add new protected routes
+- Consistent behavior across the application
+- Helper functions for common auth-related checks
+- Better maintainability and scalability
+
 ## Reference
 
 - See `phase1.md` for the full PRD, user stories, and field requirements for Requirements and Candidates.
 - All design/UX decisions are made to match the reference UI and PRD requirements.
+
+## Candidate Management Implementation (2024-05-13)
+
+### Components Created
+
+1. `src/components/forms/CandidateForm.tsx`
+
+   - Form for adding/editing candidates
+   - Includes resume upload functionality
+   - Handles validation and error states
+   - Uses styled form components for consistency
+
+2. `src/components/forms/StyledInput.tsx`
+
+   - Reusable input component with label
+   - Consistent styling across forms
+
+3. `src/components/forms/StyledSelect.tsx`
+
+   - Reusable select component with label
+   - Consistent styling across forms
+
+4. `src/components/forms/StyledTextarea.tsx`
+   - Reusable textarea component with label
+   - Consistent styling across forms
+
+### API Endpoints
+
+1. `src/app/api/candidates/route.ts`
+
+   - GET: List candidates with search and filter functionality
+   - POST: Create new candidate
+   - Protected by authentication
+   - Handles validation and error cases
+
+2. `src/app/api/candidates/upload-resume/route.ts`
+   - POST: Handle resume file uploads
+   - Validates file type (PDF, DOC, DOCX) and size (5MB limit)
+   - Stores files in public/uploads/resumes directory
+   - Updates candidate record with resume URL
+
+### Pages
+
+1. `src/app/candidates/page.tsx`
+
+   - Lists all candidates with search and filter functionality
+   - Responsive table layout
+   - Status badges with appropriate colors
+   - Links to individual candidate pages
+
+2. `src/app/candidates/new/page.tsx`
+   - Form for adding new candidates
+   - Uses CandidateForm component
+
+### Features Implemented
+
+1. Candidate Creation
+
+   - Basic information (name, email, phone, etc.)
+   - Current role and company
+   - Key skills with tag-like interface
+   - Source and status tracking
+   - Notes field for additional information
+
+2. Resume Upload
+
+   - File type validation (PDF, DOC, DOCX)
+   - File size limit (5MB)
+   - Secure file storage
+   - URL tracking in database
+
+3. Search & Filter
+
+   - Search by name, email, role, company
+   - Filter by status and source
+   - Real-time updates
+   - Responsive design
+
+4. UI/UX
+   - Consistent styling with other forms
+   - Clear error messages
+   - Loading states
+   - Responsive layout
+   - Status badges with appropriate colors
+
+### Next Steps
+
+1. Implement individual candidate view/edit page
+2. Add candidate-mandate linking functionality
+3. Implement candidate status update workflow
+4. Add candidate notes and activity history
+5. Implement candidate export functionality
