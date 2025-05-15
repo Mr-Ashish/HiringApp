@@ -1,7 +1,11 @@
 "use client";
+
 import { useState, useEffect } from "react";
 import Link from "next/link";
 import DashboardLayout from "@/components/DashboardLayout";
+import PageContainer from "@/components/layouts/PageContainer";
+import PageHeader from "@/components/layouts/PageHeader";
+import TableContainer from "@/components/layouts/TableContainer";
 import { CandidateStatus } from "@prisma/client";
 
 interface Requirement {
@@ -49,27 +53,25 @@ export default function RequirementsPage() {
   if (loading) {
     return (
       <DashboardLayout title="Requirements">
-        <div className="flex justify-center items-center h-64">
-          <div className="text-gray-500">Loading...</div>
-        </div>
+        <PageContainer>
+          <div className="flex justify-center items-center h-64">
+            <div className="text-gray-500">Loading...</div>
+          </div>
+        </PageContainer>
       </DashboardLayout>
     );
   }
 
   return (
     <DashboardLayout title="Requirements">
-      <div className="p-4 sm:p-6">
-        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
-          <h1 className="text-2xl sm:text-3xl font-bold text-gray-900">
-            Requirements
-          </h1>
-          <Link
-            href="/requirements/new"
-            className="w-full sm:w-auto bg-indigo-600 text-white px-4 py-2 rounded-md hover:bg-indigo-700 transition-colors text-center"
-          >
-            Add New Requirement
-          </Link>
-        </div>
+      <PageContainer>
+        <PageHeader
+          title="Requirements"
+          action={{
+            label: "Add New Requirement",
+            href: "/requirements/new",
+          }}
+        />
 
         {/* Search and Filters */}
         <div className="bg-white p-4 rounded-lg shadow mb-6">
@@ -110,96 +112,94 @@ export default function RequirementsPage() {
           </div>
         )}
 
-        <div className="bg-white shadow rounded-lg overflow-hidden">
-          <div className="overflow-x-auto">
-            <table className="min-w-full divide-y divide-gray-200">
-              <thead className="bg-gray-50">
-                <tr>
-                  <th className="px-4 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Title
-                  </th>
-                  <th className="px-4 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Client
-                  </th>
-                  <th className="px-4 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Priority
-                  </th>
-                  <th className="px-4 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Status
-                  </th>
-                  <th className="px-4 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Date Opened
-                  </th>
-                  <th className="px-4 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Actions
-                  </th>
+        <TableContainer>
+          <table className="min-w-full divide-y divide-gray-200">
+            <thead className="bg-gray-50">
+              <tr>
+                <th className="px-4 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  Title
+                </th>
+                <th className="px-4 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  Client
+                </th>
+                <th className="px-4 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  Priority
+                </th>
+                <th className="px-4 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  Status
+                </th>
+                <th className="px-4 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  Date Opened
+                </th>
+                <th className="px-4 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  Actions
+                </th>
+              </tr>
+            </thead>
+            <tbody className="bg-white divide-y divide-gray-200">
+              {requirements.map((requirement) => (
+                <tr key={requirement.id}>
+                  <td className="px-4 sm:px-6 py-4 whitespace-nowrap">
+                    <div className="text-sm font-medium text-gray-900">
+                      {requirement.title}
+                    </div>
+                  </td>
+                  <td className="px-4 sm:px-6 py-4 whitespace-nowrap">
+                    <div className="text-sm text-gray-500">
+                      {requirement.client.name}
+                    </div>
+                  </td>
+                  <td className="px-4 sm:px-6 py-4 whitespace-nowrap">
+                    <span
+                      className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${
+                        requirement.priority === "HIGH"
+                          ? "bg-red-100 text-red-800"
+                          : requirement.priority === "MEDIUM"
+                          ? "bg-yellow-100 text-yellow-800"
+                          : "bg-green-100 text-green-800"
+                      }`}
+                    >
+                      {requirement.priority}
+                    </span>
+                  </td>
+                  <td className="px-4 sm:px-6 py-4 whitespace-nowrap">
+                    <span
+                      className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${
+                        requirement.status === "OPEN"
+                          ? "bg-green-100 text-green-800"
+                          : requirement.status === "IN_PROGRESS"
+                          ? "bg-blue-100 text-blue-800"
+                          : "bg-gray-100 text-gray-800"
+                      }`}
+                    >
+                      {requirement.status}
+                    </span>
+                  </td>
+                  <td className="px-4 sm:px-6 py-4 whitespace-nowrap">
+                    <div className="text-sm text-gray-500">
+                      {new Date(requirement.dateOpened).toLocaleDateString()}
+                    </div>
+                  </td>
+                  <td className="px-4 sm:px-6 py-4 whitespace-nowrap text-sm font-medium">
+                    <Link
+                      href={`/requirements/${requirement.id}`}
+                      className="text-indigo-600 hover:text-indigo-900 mr-4"
+                    >
+                      View
+                    </Link>
+                    <Link
+                      href={`/requirements/${requirement.id}/edit`}
+                      className="text-indigo-600 hover:text-indigo-900"
+                    >
+                      Edit
+                    </Link>
+                  </td>
                 </tr>
-              </thead>
-              <tbody className="bg-white divide-y divide-gray-200">
-                {requirements.map((requirement) => (
-                  <tr key={requirement.id}>
-                    <td className="px-4 sm:px-6 py-4 whitespace-nowrap">
-                      <div className="text-sm font-medium text-gray-900">
-                        {requirement.title}
-                      </div>
-                    </td>
-                    <td className="px-4 sm:px-6 py-4 whitespace-nowrap">
-                      <div className="text-sm text-gray-500">
-                        {requirement.client.name}
-                      </div>
-                    </td>
-                    <td className="px-4 sm:px-6 py-4 whitespace-nowrap">
-                      <span
-                        className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${
-                          requirement.priority === "HIGH"
-                            ? "bg-red-100 text-red-800"
-                            : requirement.priority === "MEDIUM"
-                            ? "bg-yellow-100 text-yellow-800"
-                            : "bg-green-100 text-green-800"
-                        }`}
-                      >
-                        {requirement.priority}
-                      </span>
-                    </td>
-                    <td className="px-4 sm:px-6 py-4 whitespace-nowrap">
-                      <span
-                        className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${
-                          requirement.status === "OPEN"
-                            ? "bg-green-100 text-green-800"
-                            : requirement.status === "IN_PROGRESS"
-                            ? "bg-blue-100 text-blue-800"
-                            : "bg-gray-100 text-gray-800"
-                        }`}
-                      >
-                        {requirement.status}
-                      </span>
-                    </td>
-                    <td className="px-4 sm:px-6 py-4 whitespace-nowrap">
-                      <div className="text-sm text-gray-500">
-                        {new Date(requirement.dateOpened).toLocaleDateString()}
-                      </div>
-                    </td>
-                    <td className="px-4 sm:px-6 py-4 whitespace-nowrap text-sm font-medium">
-                      <Link
-                        href={`/requirements/${requirement.id}`}
-                        className="text-indigo-600 hover:text-indigo-900 mr-4"
-                      >
-                        View
-                      </Link>
-                      <Link
-                        href={`/requirements/${requirement.id}/edit`}
-                        className="text-indigo-600 hover:text-indigo-900"
-                      >
-                        Edit
-                      </Link>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        </div>
-      </div>
+              ))}
+            </tbody>
+          </table>
+        </TableContainer>
+      </PageContainer>
     </DashboardLayout>
   );
 }
