@@ -1,5 +1,13 @@
 ---
-description:
-globs:
+description: 
+globs: 
 alwaysApply: false
 ---
+- Use Prisma for all database operations.
+- Maintain proper relationships between models (User, Client, Mandate, Candidate).
+- Run and document all migrations.
+- Use transactions for multi-step DB operations.
+- Use array fields and enums as defined in the schema for consistency.
+- Update the Prisma schema and regenerate the client after model changes.
+- Use seed scripts for initial data and testing.
+- Document any schema changes in `SETUP_NOTES.md`.

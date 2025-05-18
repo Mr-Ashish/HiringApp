@@ -1,8 +1,13 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, ChangeEvent } from "react";
 import Link from "next/link";
 import { CandidateStatus } from "@prisma/client";
+import TableContainer from "@/components/layouts/TableContainer";
+import PageContainer from "@/components/layouts/PageContainer";
+import PageHeader from "@/components/layouts/PageHeader";
+import { StyledInput } from "@/components/forms/StyledInput";
+import { StyledSelect } from "@/components/forms/StyledSelect";
 
 type Candidate = {
   id: string;
@@ -24,7 +29,10 @@ export default function CandidatesPage() {
   const [sourceFilter, setSourceFilter] = useState("");
 
   useEffect(() => {
-    fetchCandidates();
+    const handler = setTimeout(() => {
+      fetchCandidates();
+    }, 400);
+    return () => clearTimeout(handler);
   }, [search, statusFilter, sourceFilter]);
 
   const fetchCandidates = async () => {
@@ -48,69 +56,55 @@ export default function CandidatesPage() {
   };
 
   return (
-    <div className="container mx-auto px-4 py-8">
-      <div className="flex justify-between items-center mb-6">
-        <h1 className="text-2xl font-bold">Candidates</h1>
-        <Link
-          href="/candidates/new"
-          className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500"
-        >
-          Add Candidate
-        </Link>
-      </div>
+    <PageContainer maxWidth="max-w-7xl">
+      <PageHeader
+        title="Candidates"
+        action={{
+          label: "Add Candidate",
+          href: "/candidates/new",
+        }}
+      />
 
       <div className="bg-white rounded-lg shadow p-6 mb-6">
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
-              Search
-            </label>
-            <input
-              type="text"
-              value={search}
-              onChange={(e) => setSearch(e.target.value)}
-              placeholder="Search by name, email, role..."
-              className="w-full p-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-            />
-          </div>
+          <StyledInput
+            label="Search"
+            value={search}
+            onChange={(e: ChangeEvent<HTMLInputElement>) =>
+              setSearch(e.target.value)
+            }
+            placeholder="Search by name, email, role..."
+          />
 
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
-              Status
-            </label>
-            <select
-              value={statusFilter}
-              onChange={(e) =>
-                setStatusFilter(e.target.value as CandidateStatus | "")
-              }
-              className="w-full p-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-            >
-              <option value="">All Statuses</option>
-              {Object.values(CandidateStatus).map((status) => (
-                <option key={status} value={status}>
-                  {status}
-                </option>
-              ))}
-            </select>
-          </div>
+          <StyledSelect
+            label="Status"
+            value={statusFilter}
+            onChange={(e: ChangeEvent<HTMLSelectElement>) =>
+              setStatusFilter(e.target.value as CandidateStatus | "")
+            }
+          >
+            <option value="">All Statuses</option>
+            {Object.values(CandidateStatus).map((status) => (
+              <option key={status} value={status}>
+                {status}
+              </option>
+            ))}
+          </StyledSelect>
 
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
-              Source
-            </label>
-            <select
-              value={sourceFilter}
-              onChange={(e) => setSourceFilter(e.target.value)}
-              className="w-full p-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-            >
-              <option value="">All Sources</option>
-              <option value="LINKEDIN">LinkedIn</option>
-              <option value="REFERRAL">Referral</option>
-              <option value="JOB_BOARD">Job Board</option>
-              <option value="DIRECT">Direct</option>
-              <option value="OTHER">Other</option>
-            </select>
-          </div>
+          <StyledSelect
+            label="Source"
+            value={sourceFilter}
+            onChange={(e: ChangeEvent<HTMLSelectElement>) =>
+              setSourceFilter(e.target.value)
+            }
+          >
+            <option value="">All Sources</option>
+            <option value="LINKEDIN">LinkedIn</option>
+            <option value="REFERRAL">Referral</option>
+            <option value="JOB_BOARD">Job Board</option>
+            <option value="DIRECT">Direct</option>
+            <option value="OTHER">Other</option>
+          </StyledSelect>
         </div>
       </div>
 
@@ -127,7 +121,7 @@ export default function CandidatesPage() {
           No candidates found
         </div>
       ) : (
-        <div className="bg-white rounded-lg shadow overflow-hidden">
+        <TableContainer>
           <table className="min-w-full divide-y divide-gray-200">
             <thead className="bg-gray-50">
               <tr>
@@ -146,17 +140,14 @@ export default function CandidatesPage() {
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                   Added
                 </th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  Actions
+                </th>
               </tr>
             </thead>
             <tbody className="bg-white divide-y divide-gray-200">
               {candidates.map((candidate) => (
-                <tr
-                  key={candidate.id}
-                  className="hover:bg-gray-50 cursor-pointer"
-                  onClick={() =>
-                    (window.location.href = `/candidates/${candidate.id}`)
-                  }
-                >
+                <tr key={candidate.id}>
                   <td className="px-6 py-4 whitespace-nowrap">
                     <div className="text-sm font-medium text-gray-900">
                       {candidate.fullName}
@@ -202,12 +193,20 @@ export default function CandidatesPage() {
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                     {new Date(candidate.createdAt).toLocaleDateString()}
                   </td>
+                  <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                    <Link
+                      href={`/candidates/${candidate.id}`}
+                      className="text-indigo-600 hover:text-indigo-900"
+                    >
+                      View
+                    </Link>
+                  </td>
                 </tr>
               ))}
             </tbody>
           </table>
-        </div>
+        </TableContainer>
       )}
-    </div>
+    </PageContainer>
   );
 }

@@ -1,5 +1,15 @@
 ---
-description:
-globs:
-alwaysApply: false
+description: 
+globs: 
+alwaysApply: true
 ---
+- Use `StyledInput`, `StyledSelect`, `StyledTextarea` for all forms.
+- Use `PageContainer`, `PageHeader`, and `TableContainer` for layout and tables.
+- Style with Tailwind CSS and maintain responsive design.
+- Do not duplicate UI logic; always use or extend shared components.
+- All main content must be wrapped in `PageContainer` inside `DashboardLayout`.
+- Use `Sidebar` for navigation and ensure it highlights the active tab for all subpaths.
+- Use proper loading and error states in all components.
+- Use consistent spacing, alignment, and responsive patterns across all pages.
+- Add feedback and error handling for all forms.
+- Use feature branches for UI changes and keep commits focused.

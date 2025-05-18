@@ -1,5 +1,13 @@
 ---
-description:
-globs:
-alwaysApply: false
+description: 
+globs: 
+alwaysApply: true
 ---
+- Use Conventional Commits for all commit messages (e.g., `feat(ui): add responsive design to requirements page`).
+- Update `SETUP_NOTES.md`, `PROJECT_PRACTICES.md`, and `phase1.md` after major changes.
+- Keep documentation and codebase in sync.
+- Use date headers and clear summaries in documentation files.
+- Document architectural decisions and rationale in `PROJECT_PRACTICES.md`.
+- Add new patterns or conventions discovered to `PROJECT_PRACTICES.md`.
+- Reference related files and cross-link documentation as needed.
+- Use feature branches and keep commits focused and atomic.

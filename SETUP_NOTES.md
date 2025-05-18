@@ -418,4 +418,62 @@ _Example:_
   - Next: Complete CRUD, resume upload, linking to requirements, search/filter, status tracking, and UI/UX improvements
 - All new work will follow Cursor rules, shared component conventions, and documentation/commit practices
 
+## [2024-05-18] Candidate List & Demo Data
+
+- Added demo candidate data to `prisma/seed.ts` and reseeded the database
+- Improved candidate list page: uses TableContainer, debounced search/filter, shared UI, and proper loading/error/empty states
+- All changes follow Cursor rules and shared component conventions
+
+## [2024-05-18] Page Layout & Component Usage Rules Update
+
+- Added comprehensive page layout and component usage rules to `PROJECT_PRACTICES.md`
+- Rules cover:
+  - Layout hierarchy (DashboardLayout, PageContainer)
+  - Page header usage (PageHeader component)
+  - Table usage (TableContainer)
+  - Form components (StyledInput, StyledSelect, StyledTextarea)
+  - Type safety (event handlers, state variables)
+  - Error handling (boundaries, messages, states)
+  - Responsive design (Tailwind classes)
+  - Component location (directory structure)
+  - Documentation (comments, props, patterns)
+- Fixed candidates page to follow these rules:
+  - Added PageContainer with proper maxWidth
+  - Used PageHeader for title and action
+  - Used StyledInput and StyledSelect for filters
+  - Added proper TypeScript types
+  - Maintained consistent error handling
+- These rules ensure consistent UI/UX across all pages and prevent future inconsistencies
+
+## [2024-05-18] Candidate Management Status Update
+
+### Completed
+
+- [x] Candidate list page with search/filter (basic)
+- [x] Candidate creation form (validation, shared components)
+- [x] Candidate detail/edit page (unified with other entities)
+- [x] Resume upload and file validation (robust directory handling)
+- [x] API endpoints for candidate CRUD and resume upload
+- [x] Consistent use of shared UI components and error handling
+
+### Partially Complete
+
+- [ ] Candidate search & filter (advanced: by skills, linked requirements, real-time updates)
+- [ ] Candidate status tracking (advanced workflow, history)
+- [ ] UI/UX polish for edge cases and mobile
+
+### Not Yet Implemented
+
+- [ ] Delete candidate (UI + API)
+- [ ] Linking candidates to requirements (UI + API, both directions)
+- [ ] Display linked requirements/candidates on profile/detail pages
+- [ ] Candidate notes & activity history (UI + API)
+- [ ] Candidate profile enhancements (timeline, activity feed)
+- [ ] Advanced search/filter (skills, linked requirements, real-time)
+- [ ] Candidate export
+
+---
+
+Testing is the next step. All code and documentation are up to date as of this commit.
+
 ---

@@ -2,7 +2,7 @@ import { NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import prisma from "@/lib/prisma";
-import { writeFile } from "fs/promises";
+import { mkdir, writeFile } from "fs/promises";
 import { join } from "path";
 
 export async function POST(req: Request) {
@@ -42,6 +42,7 @@ export async function POST(req: Request) {
 
     // Create uploads directory if it doesn't exist
     const uploadsDir = join(process.cwd(), "public", "uploads", "resumes");
+    await mkdir(uploadsDir, { recursive: true });
     await writeFile(
       join(uploadsDir, file.name),
       Buffer.from(await file.arrayBuffer())

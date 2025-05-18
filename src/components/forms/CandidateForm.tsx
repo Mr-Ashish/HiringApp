@@ -110,6 +110,18 @@ export default function CandidateForm() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           ...formData,
+          yearsOfExperience: formData.yearsOfExperience
+            ? Number(formData.yearsOfExperience)
+            : 0,
+          keySkills: Array.isArray(formData.keySkills)
+            ? formData.keySkills
+            : typeof formData.keySkills === "string"
+            ? (formData.keySkills as string)
+                .split(",")
+                .map((s: string) => s.trim())
+                .filter(Boolean)
+            : [],
+          status: String(formData.status || "NEW"),
           resume: undefined, // Don't send file in JSON
         }),
       });
@@ -122,13 +134,13 @@ export default function CandidateForm() {
 
       // Then, if there's a resume, upload it
       if (formData.resume) {
-        const formData = new FormData();
-        formData.append("resume", formData.resume);
-        formData.append("candidateId", candidate.id);
+        const uploadFormData = new FormData();
+        uploadFormData.append("resume", formData.resume);
+        uploadFormData.append("candidateId", candidate.id);
 
         const uploadResponse = await fetch("/api/candidates/upload-resume", {
           method: "POST",
-          body: formData,
+          body: uploadFormData,
         });
 
         if (!uploadResponse.ok) {

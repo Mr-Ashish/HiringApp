@@ -438,4 +438,131 @@ Remember to:
   - Use conventional commits for all work
   - Keep documentation and codebase in sync
 
+## Page Layout & Component Usage Rules
+
+### 1. Layout Hierarchy
+
+- All pages must use `DashboardLayout` as the outermost wrapper
+- All main content must be wrapped in `PageContainer`
+- List/table pages must use `maxWidth="max-w-7xl"`
+- Form/detail pages must use `maxWidth="max-w-2xl"`
+- Never create custom layout wrappers
+
+### 2. Page Header
+
+- Every page must use `PageHeader` for title and actions
+- Action buttons must be passed through `PageHeader`'s action prop
+- Never create custom header sections
+- Example:
+  ```tsx
+  <PageHeader
+    title="Candidates"
+    action={{ label: "Add New", href: "/candidates/new" }}
+  />
+  ```
+
+### 3. Table Usage
+
+- All tables must be wrapped in `TableContainer`
+- Never create custom table wrappers or containers
+- Use consistent table styling and structure
+- Include proper loading, error, and empty states
+- Example:
+  ```tsx
+  <TableContainer>
+    <table>...</table>
+  </TableContainer>
+  ```
+
+### 4. Form Components
+
+- Use `StyledInput`, `StyledSelect`, `StyledTextarea` for all form fields
+- Never create custom form input components
+- Import form components using named imports
+- Add proper TypeScript types for event handlers
+- Example:
+
+  ```tsx
+  import { StyledInput, StyledSelect } from "@/components/forms";
+
+  <StyledInput
+    label="Search"
+    value={search}
+    onChange={(e: ChangeEvent<HTMLInputElement>) => setSearch(e.target.value)}
+  />;
+  ```
+
+### 5. Type Safety
+
+- Add proper types for all event handlers
+- Use TypeScript's `ChangeEvent` type for form events
+- Properly type all state variables
+- Avoid using `any` type
+- Example:
+  ```tsx
+  const [search, setSearch] = useState<string>("");
+  const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
+    setSearch(e.target.value);
+  };
+  ```
+
+### 6. Error Handling
+
+- Implement proper error boundaries
+- Show user-friendly error messages
+- Handle loading and error states in components
+- Provide fallback UI when necessary
+- Example:
+  ```tsx
+  {
+    error && (
+      <div className="p-4 bg-red-100 text-red-700 rounded-md mb-6">{error}</div>
+    );
+  }
+  ```
+
+### 7. Responsive Design
+
+- Use Tailwind's responsive classes
+- Test on multiple screen sizes
+- Ensure proper spacing and alignment
+- Handle mobile layouts appropriately
+- Example:
+  ```tsx
+  <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+    {/* Form fields */}
+  </div>
+  ```
+
+### 8. Component Location
+
+- Place reusable components in appropriate directories:
+  - Layout components: `src/components/layouts/`
+  - Form components: `src/components/forms/`
+  - Other shared UI: `src/components/`
+- Never duplicate similar components
+- Always check for existing components before creating new ones
+
+### 9. Documentation
+
+- Document component usage in comments
+- Keep component props typed and documented
+- Update documentation when modifying shared components
+- Follow established patterns for new components
+
+## [2024-05-18] Candidate Management Status (see SETUP_NOTES.md and phase2.md)
+
+- [x] Candidate CRUD (list, create, edit, resume upload, shared components)
+- [x] API endpoints for candidate CRUD and resume upload
+- [x] Consistent UI/UX and error handling
+- [ ] Delete candidate (UI + API)
+- [ ] Candidate-requirement linking (UI + API, both directions)
+- [ ] Linked requirements/candidates display
+- [ ] Candidate notes & activity history
+- [ ] Profile enhancements (timeline, activity feed)
+- [ ] Advanced search/filter (skills, linked requirements, real-time)
+- [ ] Candidate export
+
+See SETUP_NOTES.md and phase2.md for full breakdown and next steps.
+
 ---
