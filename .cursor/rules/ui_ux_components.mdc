@@ -1,7 +1,7 @@
 ---
 description: 
 globs: 
-alwaysApply: true
+alwaysApply: false
 ---
 - Use `StyledInput`, `StyledSelect`, `StyledTextarea` for all forms.
 - Use `PageContainer`, `PageHeader`, and `TableContainer` for layout and tables.

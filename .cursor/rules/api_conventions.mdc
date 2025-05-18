@@ -1,5 +1,14 @@
 ---
-description:
-globs:
+description: 
+globs: 
 alwaysApply: false
 ---
+- Use RESTful endpoint naming and group related endpoints in subdirectories.
+- Always check session/auth in protected API routes using `getServerSession` and return 401 for unauthorized access.
+- Return proper HTTP status codes and consistent error formats (JSON with `message` field for errors).
+- Validate all input data and sanitize user input.
+- Log errors appropriately and handle edge cases gracefully.
+- Use TypeScript types for request/response bodies.
+- Use Prisma client from `src/lib/prisma` for all DB operations.
+- Use transactions when needed for multi-step DB operations.
+- Document all endpoints and update documentation after changes.

@@ -565,4 +565,25 @@ Remember to:
 
 See SETUP_NOTES.md and phase2.md for full breakdown and next steps.
 
+## General Practices
+
+- **Code Style**: Follow the established code style guidelines for consistency.
+- **Version Control**: Use meaningful commit messages and branch naming conventions.
+- **Documentation**: Keep all documentation up-to-date and organized in the `docs` folder.
+- **Code Review**: Conduct thorough code reviews before merging changes.
+
+## Testing Practices
+
+- **Test Case Planning**: Refer to the [Phase 1.5 Test Case Planning](phase1.5.md) document for a comprehensive list of test cases for all implemented features.
+- **Automated Testing**: Implement automated tests for all test cases to ensure consistent and reliable testing.
+- **Manual Testing**: Conduct manual testing to verify user experience and edge cases not covered by automated tests.
+- **Documentation**: Keep documentation updated with test results and any necessary changes.
+
+## Future Practices
+
+- **Feature Planning**: Document all new features and their test cases in the `docs` folder.
+- **Security**: Regularly review and update security practices to protect against common vulnerabilities.
+- **Performance**: Monitor and optimize application performance regularly.
+- **Accessibility**: Ensure all new features are accessible to all users.
+
 ---

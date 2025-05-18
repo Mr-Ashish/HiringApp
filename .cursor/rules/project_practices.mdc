@@ -1,7 +1,7 @@
 ---
 description: 
 globs: 
-alwaysApply: true
+alwaysApply: false
 ---
 - Always check `SETUP_NOTES.md` for current status before starting work.
 - Review `PROJECT_PRACTICES.md` for ongoing conventions and patterns.
