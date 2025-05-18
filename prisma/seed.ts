@@ -63,7 +63,7 @@ async function main() {
       roleComplexityScore: 7,
       brandNotes: "Strong employer brand in the tech industry",
       pricingThresholdMet: true,
-      internalDecision: "PRIORITIZE",
+      internalDecision: "APPROVED",
       decisionJustification:
         "High-value client with clear requirements and good budget",
     },

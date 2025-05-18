@@ -184,11 +184,12 @@ enum MandateStatus {
 
 enum EmploymentType {
   FULL_TIME
+  PART_TIME
   CONTRACT
 }
 
 enum InternalDecision {
-  PRIORITIZE
-  DEPRIORITIZE
-  REJECT
+  PENDING
+  APPROVED
+  REJECTED
 } 

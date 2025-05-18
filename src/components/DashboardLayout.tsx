@@ -1,4 +1,7 @@
+"use client";
 import Sidebar from "./Sidebar";
+import { useSession } from "next-auth/react";
+import { useEffect } from "react";
 
 export default function DashboardLayout({
   title,
@@ -7,6 +10,20 @@ export default function DashboardLayout({
   title?: string;
   children: React.ReactNode;
 }) {
+  const { status } = useSession();
+  const router =
+    typeof window !== "undefined"
+      ? require("next/navigation").useRouter()
+      : null;
+  useEffect(() => {
+    if (status === "unauthenticated" && router) {
+      router.push("/login");
+    }
+  }, [status, router]);
+  if (status === "loading") {
+    return <div className="p-8">Checking authentication...</div>;
+  }
+
   return (
     <div className="min-h-screen bg-gray-50">
       <Sidebar />

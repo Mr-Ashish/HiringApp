@@ -41,11 +41,17 @@ export async function PUT(
     const { id } = params;
     const body = await request.json();
     // TODO: Validate all required fields from PRD
+    const { clientId, recruiterId, ...rest } = body;
+    const data: any = { ...rest };
+    if (clientId) {
+      data.client = { connect: { id: clientId } };
+    }
+    if (recruiterId) {
+      data.recruiter = { connect: { id: recruiterId } };
+    }
     const requirement = await prisma.mandate.update({
       where: { id },
-      data: {
-        ...body,
-      },
+      data,
     });
     return NextResponse.json(requirement);
   } catch (error) {

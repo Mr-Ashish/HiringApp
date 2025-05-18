@@ -4,6 +4,7 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import DashboardLayout from "@/components/DashboardLayout";
 import StyledInput from "@/components/StyledInput";
+import FormPageHeader from "@/components/layouts/FormPageHeader";
 
 export default function NewClientPage() {
   const router = useRouter();
@@ -67,6 +68,7 @@ export default function NewClientPage() {
   return (
     <DashboardLayout title="Add New Client">
       <div className="max-w-2xl mx-auto bg-white rounded-lg shadow p-8">
+        <FormPageHeader title="Add New Client" />
         {error && (
           <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded mb-6">
             {error}
