@@ -1,11 +1,13 @@
 "use client";
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
+import { useSession } from "next-auth/react";
 import DashboardLayout from "@/components/DashboardLayout";
 import StyledInput, {
   StyledSelect,
   StyledTextarea,
 } from "@/components/StyledInput";
+import FormPageHeader from "@/components/layouts/FormPageHeader";
 
 const TABS = [
   "Requirements",
@@ -26,6 +28,7 @@ export default function NewRequirementPage() {
   const [clientsLoading, setClientsLoading] = useState(true);
   const [clientsError, setClientsError] = useState<string | null>(null);
   const router = useRouter();
+  const { status } = useSession();
 
   const handleChange = (
     e: React.ChangeEvent<
@@ -35,8 +38,84 @@ export default function NewRequirementPage() {
     setForm({ ...form, [e.target.name]: e.target.value });
   };
 
+  // Validation for each step
+  const validateStep = () => {
+    if (tab === 0) {
+      // Requirements tab
+      if (
+        !form.title ||
+        !form.clientId ||
+        !form.priority ||
+        !form.status ||
+        !form.dateOpened
+      ) {
+        setError("Please fill all required fields in this section.");
+        return false;
+      }
+    }
+    if (tab === 1) {
+      if (
+        !form.reportingLines ||
+        !form.location ||
+        !form.employmentType ||
+        !form.jobDescription
+      ) {
+        setError("Please fill all required fields in this section.");
+        return false;
+      }
+    }
+    if (tab === 2) {
+      if (!form.salaryMin || !form.salaryMax || !form.feePercentage) {
+        setError("Please fill all required fields in this section.");
+        return false;
+      }
+    }
+    if (tab === 3) {
+      if (
+        !form.targetSourcingSLA ||
+        !form.targetOfferDate ||
+        !form.targetCloseDate
+      ) {
+        setError("Please fill all required fields in this section.");
+        return false;
+      }
+    }
+    if (tab === 4) {
+      if (!form.idealProfile || !form.experienceMin || !form.experienceMax) {
+        setError("Please fill all required fields in this section.");
+        return false;
+      }
+    }
+    if (tab === 6) {
+      if (
+        !form.clientEngagementScore ||
+        !form.roleComplexityScore ||
+        !form.decisionJustification
+      ) {
+        setError("Please fill all required fields in this section.");
+        return false;
+      }
+    }
+    setError(null);
+    return true;
+  };
+
+  const handleNext = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (validateStep()) {
+      setTab((prev) => prev + 1);
+    }
+  };
+
+  const handleBack = (e: React.FormEvent) => {
+    e.preventDefault();
+    setTab((prev) => prev - 1);
+    setError(null);
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (!validateStep()) return;
     setLoading(true);
     setError(null);
     try {
@@ -45,7 +124,10 @@ export default function NewRequirementPage() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(form),
       });
-      if (!res.ok) throw new Error("Failed to create requirement");
+      if (!res.ok) {
+        const data = await res.json().catch(() => ({}));
+        throw new Error(data.message || "Failed to create requirement");
+      }
       router.push("/requirements");
     } catch (err) {
       setError(err instanceof Error ? err.message : "An error occurred");
@@ -74,11 +156,22 @@ export default function NewRequirementPage() {
     fetchClients();
   }, []);
 
+  useEffect(() => {
+    if (status === "unauthenticated") {
+      router.push("/login");
+    }
+  }, [status, router]);
+
+  if (status === "loading") {
+    return <div className="p-8">Checking authentication...</div>;
+  }
+
   return (
     <DashboardLayout title="New Requirement">
       <div className="max-w-4xl mx-auto bg-white rounded-lg shadow p-8">
+        <FormPageHeader title="Add New Requirement" />
         <div className="mb-6">
-          <div className="flex space-x-4 border-b">
+          <div className="flex space-x-4 border-b overflow-x-auto flex-nowrap scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-gray-100">
             {TABS.map((tabName, index) => (
               <button
                 key={tabName}
@@ -101,7 +194,7 @@ export default function NewRequirementPage() {
           </div>
         )}
 
-        <form onSubmit={handleSubmit}>
+        <form onSubmit={tab === TABS.length - 1 ? handleSubmit : handleNext}>
           {/* Requirements Tab */}
           {tab === 0 && (
             <div className="space-y-4">
@@ -150,8 +243,13 @@ export default function NewRequirementPage() {
                 required
               >
                 <option value="">Select Status</option>
+                <option value="NEW">New</option>
                 <option value="OPEN">Open</option>
-                <option value="IN_PROGRESS">In Progress</option>
+                <option value="SOURCING">Sourcing</option>
+                <option value="INTERVIEWING">Interviewing</option>
+                <option value="OFFER">Offer</option>
+                <option value="FILLED">Filled</option>
+                <option value="ON_HOLD">On Hold</option>
                 <option value="CLOSED">Closed</option>
               </StyledSelect>
               <StyledInput
@@ -462,20 +560,32 @@ export default function NewRequirementPage() {
           )}
 
           <div className="mt-8 flex justify-end space-x-4">
-            <button
-              type="button"
-              onClick={() => router.back()}
-              className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
-            >
-              Cancel
-            </button>
-            <button
-              type="submit"
-              disabled={loading}
-              className="px-4 py-2 text-sm font-medium text-white bg-indigo-600 border border-transparent rounded-md hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 disabled:opacity-50"
-            >
-              {loading ? "Creating..." : "Create Requirement"}
-            </button>
+            {tab > 0 && (
+              <button
+                type="button"
+                onClick={handleBack}
+                className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+              >
+                Back
+              </button>
+            )}
+            {tab < TABS.length - 1 && (
+              <button
+                type="submit"
+                className="px-4 py-2 text-sm font-medium text-white bg-indigo-600 border border-transparent rounded-md hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+              >
+                Next
+              </button>
+            )}
+            {tab === TABS.length - 1 && (
+              <button
+                type="submit"
+                disabled={loading}
+                className="px-4 py-2 text-sm font-medium text-white bg-indigo-600 border border-transparent rounded-md hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 disabled:opacity-50"
+              >
+                {loading ? "Creating..." : "Create Requirement"}
+              </button>
+            )}
           </div>
         </form>
       </div>

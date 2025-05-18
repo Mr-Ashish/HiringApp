@@ -397,4 +397,25 @@ _Example:_
 - **Do not wrap tables in custom divs or containers; always use the shared component.**
 - **LEARNING:** Enforce the use of common components for general UI patterns (like tables, forms, layouts) to ensure consistency and make global changes easy.
 
+## [2024-05-14] UI/UX, Data, and Workflow Improvements
+
+- Sidebar now highlights the active tab for all subpaths (e.g., /clients/new, /requirements/new, etc.)
+- Requirements form client dropdown now fetches and displays all clients
+- Client contact details (person, email, phone) are saved and shown correctly
+- Back buttons added to key forms and detail pages for better navigation
+- Batch commit and push of all recent changes for a clean repo
+- Reminder: Commit after each logical change or feature/fix
+- Use common components for all general UI patterns (e.g., TableContainer for tables)
+- TableContainer is now enforced for all tables for consistent scroll and styling
+- Coding practice: Always check for and use shared components before creating new ones
+- Sidebar highlight logic is now robust and future-proof for all subpaths
+
+## [2024-05-17] Phase 2 Kickoff: Candidate Management
+
+- Phase 2 started: see `phase2.md` for full breakdown and objectives
+- Candidate management: initial CRUD, API, and form scaffolding already present
+  - Existing: `src/app/candidates/page.tsx`, `src/app/candidates/new/page.tsx`, `src/components/forms/CandidateForm.tsx`, API routes
+  - Next: Complete CRUD, resume upload, linking to requirements, search/filter, status tracking, and UI/UX improvements
+- All new work will follow Cursor rules, shared component conventions, and documentation/commit practices
+
 ---

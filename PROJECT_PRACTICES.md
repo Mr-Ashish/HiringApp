@@ -427,4 +427,15 @@ Remember to:
 - If a change is needed for a general UI pattern (e.g., table scroll, form field style), update the shared component so all usages benefit.
 - **Coding Practice:** Enforce the use of shared components for all similar use cases. Review PRs for duplicate UI logic and refactor to use the common component if found.
 
+## [2024-05-17] Phase 2 Practices Update
+
+- Phase 2 (Candidate Management & Advanced Features) started; see `phase2.md` for breakdown
+- All new features must:
+  - Follow Cursor project rules in `.cursor/rules/`
+  - Use and extend shared components for all UI patterns
+  - Maintain consistent error handling and validation in API routes
+  - Update `SETUP_NOTES.md` and `phase2.md` after each major change
+  - Use conventional commits for all work
+  - Keep documentation and codebase in sync
+
 ---

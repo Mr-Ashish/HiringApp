@@ -1,0 +1,34 @@
+---
+description: 
+globs: 
+alwaysApply: true
+---
+- Always check `SETUP_NOTES.md` for current status before starting work.
+- Review `PROJECT_PRACTICES.md` for ongoing conventions and patterns.
+- Reference `phase1.md` for requirements and PRD.
+- Use shared UI components from `src/components/layouts/` and `src/components/forms/` for all new pages and refactors.
+- Maintain consistent error handling in API routes (proper status codes, error format).
+- Use conventional commits and keep documentation up to date.
+- Protect all main pages at the layout level (e.g., `DashboardLayout`) for authentication, not at the individual page level.
+- Commit after each logical change or feature/fix.
+- Only keep ongoing practices in `PROJECT_PRACTICES.md`; use `SETUP_NOTES.md` for status updates and logs.
+- Enforce the use of shared components for all general UI patterns (like tables, forms, layouts) to ensure consistency and make global changes easy.
+- Use and extend shared components for all general UI patterns.
+- Keep documentation and codebase in sync.
+- Document any architectural decisions in `PROJECT_PRACTICES.md`.
+- Use Tailwind CSS for all styling and maintain responsive design.
+- Never duplicate similar logic or markup across pages; always use or extend the shared component.
+- All tables must be wrapped in `TableContainer` for consistent scroll and styling.
+- All main content must be wrapped in `PageContainer` inside `DashboardLayout`.
+- Use `PageHeader` for consistent page titles and actions.
+- Use proper TypeScript types for all API responses and component props.
+- Avoid using `any` type; leverage TypeScript's strict mode.
+- Use proper error boundaries and user-friendly error messages in the frontend.
+- Always validate and sanitize user input in API routes.
+- Use Prisma for all database operations and maintain proper relationships between models.
+- Run and document all migrations.
+- Use transactions for multi-step DB operations.
+- Use environment variables for sensitive data and configuration.
+- Update documentation after implementing new features or making architectural changes.
+- Use feature branches and keep commits focused and atomic.
+- Review PRs for duplicate UI logic and refactor to use the common component if found.

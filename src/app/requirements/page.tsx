@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import Link from "next/link";
 import DashboardLayout from "@/components/DashboardLayout";
 import PageContainer from "@/components/layouts/PageContainer";
@@ -29,7 +29,10 @@ export default function RequirementsPage() {
   const [priorityFilter, setPriorityFilter] = useState<string>("");
 
   useEffect(() => {
-    fetchRequirements();
+    const handler = setTimeout(() => {
+      fetchRequirements();
+    }, 400);
+    return () => clearTimeout(handler);
   }, [search, statusFilter, priorityFilter]);
 
   const fetchRequirements = async () => {
@@ -183,15 +186,9 @@ export default function RequirementsPage() {
                   <td className="px-4 sm:px-6 py-4 whitespace-nowrap text-sm font-medium">
                     <Link
                       href={`/requirements/${requirement.id}`}
-                      className="text-indigo-600 hover:text-indigo-900 mr-4"
-                    >
-                      View
-                    </Link>
-                    <Link
-                      href={`/requirements/${requirement.id}/edit`}
                       className="text-indigo-600 hover:text-indigo-900"
                     >
-                      Edit
+                      View
                     </Link>
                   </td>
                 </tr>
